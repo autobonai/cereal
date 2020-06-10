@@ -21,7 +21,7 @@ static std::vector<std::string> get_services() {
 
   for (const auto& it : services) {
     std::string name = it.name;
-    if (name == "plusFrame" || name == "uiLayoutState") continue;
+    if (name == "plusFrame" || name == "uiLayoutState" || name == "auxSensor") continue;
     name_list.push_back(name);
   }
 
