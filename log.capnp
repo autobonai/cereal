@@ -2051,5 +2051,6 @@ struct Event {
     dMonitoringState @71: DMonitoringState;
     liveLocationKalman @72 :LiveLocationKalman;
     sentinel @73 :Sentinel;
+    auxSensor @74 :Sentinel;
   }
 }
