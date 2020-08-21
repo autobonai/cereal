@@ -130,6 +130,7 @@ struct FrameData {
   focusVal @16 :List(Int16);
   focusConf @17 :List(UInt8);
   sharpnessScore @18 :List(UInt16);
+  recoverState @19 :Int32;
 
   frameType @7 :FrameType;
   timestampSof @8 :UInt64;
@@ -285,6 +286,7 @@ struct ThermalData {
   networkType @22 :NetworkType;
   offroadPowerUsage @23 :UInt32;  # Power usage since going offroad in uWh
   networkStrength @24 :NetworkStrength;
+  carBatteryCapacity @25 :UInt32;  # Estimated remaining car battery capacity in uWh
 
   fanSpeed @10 :UInt16;
   started @11 :Bool;
@@ -371,6 +373,9 @@ struct HealthData {
     interruptRateTim1 @16;
     interruptRateTim3 @17;
     registerDivergent @18;
+    interruptRateKlineInit @19;
+    interruptRateClockSource @20;
+    interruptRateTim9 @21;
     # Update max fault type in boardd when adding faults
   }
 
@@ -381,6 +386,7 @@ struct HealthData {
     blackPanda @3;
     pedal @4;
     uno @5;
+    dos @6;
   }
 
   enum UsbPowerMode {
@@ -438,18 +444,22 @@ struct RadarState @0x9a185389d6fdd05f {
 struct LiveCalibrationData {
   # deprecated
   warpMatrix @0 :List(Float32);
+
   # camera_frame_from_model_frame
   warpMatrix2 @5 :List(Float32);
   warpMatrixBig @6 :List(Float32);
+
   calStatus @1 :Int8;
   calCycle @2 :Int32;
   calPerc @3 :Int8;
+  validBlocks @9 :Int32;
 
   # view_frame_from_road_frame
   # ui's is inversed needs new
   extrinsicMatrix @4 :List(Float32);
   # the direction of travel vector in device frame
   rpyCalib @7 :List(Float32);
+  rpyCalibSpread @8 :List(Float32);
 }
 
 struct LiveTracks {
@@ -596,8 +606,6 @@ struct ControlsState @0x97ff69c53601abf1 {
     lqrOutput @4 :Float32;
     saturated @5 :Bool;
    }
-
-
 }
 
 struct LiveEventData {
@@ -607,6 +615,8 @@ struct LiveEventData {
 
 struct ModelData {
   frameId @0 :UInt32;
+  frameAge @12 :UInt32;
+  frameDropPerc @13 :Float32;
   timestampEof @9 :UInt64;
 
   path @1 :PathData;
@@ -840,6 +850,7 @@ struct LiveLocationKalman {
   # These angles are all eulers and roll, pitch, yaw
   # orientationECEF transforms to rot matrix: ecef_from_device
   orientationECEF @6 : Measurement;
+  calibratedOrientationECEF @20 : Measurement;
   orientationNED @7 : Measurement;
   angularVelocityDevice @8 : Measurement;
 
@@ -859,6 +870,8 @@ struct LiveLocationKalman {
   inputsOK @17 :Bool = true;
   posenetOK @18 :Bool = true;
   gpsOK @19 :Bool = true;
+  sensorsOK @21 :Bool = true;
+  deviceStable @22 :Bool = true;
 
   enum Status {
     uninitialized @0;
@@ -1886,6 +1899,7 @@ struct DriverState {
   irPwrDEPRECATED @10 :Float32;
   faceOrientationStd @11 :List(Float32);
   facePositionStd @12 :List(Float32);
+  sgProb @13 :Float32;
 }
 
 struct DMonitoringState {
