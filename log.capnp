@@ -186,6 +186,7 @@ struct SensorEventData {
     gyroUncalibrated @12 :SensorVec;
     proximity @13: Float32;
     light @14: Float32;
+    temperature @15: Float32;
   }
   source @8 :SensorSource;
 
@@ -203,6 +204,8 @@ struct SensorEventData {
     lsm6ds3 @5;   # accelerometer (c2)
     bmp280 @6;    # barometer (c2)
     mmc3416x @7;  # magnetometer (c2)
+    bmx055 @8;
+    rpr0521 @9;
   }
 }
 
@@ -267,14 +270,15 @@ struct CanData {
 }
 
 struct ThermalData {
-  cpu0 @0 :UInt16;
-  cpu1 @1 :UInt16;
-  cpu2 @2 :UInt16;
-  cpu3 @3 :UInt16;
-  mem @4 :UInt16;
-  gpu @5 :UInt16;
-  bat @6 :UInt32;
-  pa0 @21 :UInt16;
+  # Deprecated
+  cpu0DEPRECATED @0 :UInt16;
+  cpu1DEPRECATED @1 :UInt16;
+  cpu2DEPRECATED @2 :UInt16;
+  cpu3DEPRECATED @3 :UInt16;
+  memDEPRECATED @4 :UInt16;
+  gpuDEPRECATED @5 :UInt16;
+  batDEPRECATED @6 :UInt32;
+  pa0DEPRECATED @21 :UInt16;
 
   # not thermal
   freeSpace @7 :Float32;
@@ -298,6 +302,12 @@ struct ThermalData {
 
   memUsedPercent @19 :Int8;
   cpuPerc @20 :Int8;
+
+  cpu @26 :List(Float32);
+  gpu @27 :List(Float32);
+  mem @28 :Float32;
+  bat @29 :Float32;
+  ambient @30 :Float32;
 
   enum ThermalStatus {
     green @0;   # all processes run
@@ -561,7 +571,7 @@ struct ControlsState @0x97ff69c53601abf1 {
 
   enum AlertStatus {
     normal @0;       # low priority alert for user's convenience
-    userPrompt @1;   # mid piority alert that might require user intervention
+    userPrompt @1;   # mid priority alert that might require user intervention
     critical @2;     # high priority alert that needs immediate user intervention
   }
 
@@ -605,7 +615,7 @@ struct ControlsState @0x97ff69c53601abf1 {
     output @3 :Float32;
     lqrOutput @4 :Float32;
     saturated @5 :Bool;
-   }
+  }
 }
 
 struct LiveEventData {
@@ -677,6 +687,54 @@ struct ModelData {
     accelerations @1 :List(Float32);
   }
 }
+
+
+struct ModelDataV2 {
+  frameId @0 :UInt32;
+  frameAge @1 :UInt32;
+  frameDropPerc @2 :Float32;
+  timestampEof @3 :UInt64;
+
+  position @4 :XYZTData;
+  orientation @5 :XYZTData;
+  velocity @6 :XYZTData;
+  orientationRate @7 :XYZTData;
+  laneLines @8 :List(XYZTData);
+  laneLineProbs @9 :List(Float32);
+  laneLineStds @13 :List(Float32);
+  roadEdges @10 :List(XYZTData);
+  roadEdgeStds @14 :List(Float32);
+  leads @11 :List(LeadDataV2);
+
+  meta @12 :MetaData;
+
+  struct XYZTData {
+    x @0 :List(Float32);
+    y @1 :List(Float32);
+    z @2 :List(Float32);
+    t @3 :List(Float32);
+    xStd @4 :List(Float32);
+    yStd @5 :List(Float32);
+    zStd @6 :List(Float32);
+  }
+
+  struct LeadDataV2 {
+    prob @0 :Float32;
+    t @1 :Float32;
+    xyva @2 :List(Float32);
+    xyvaStd @3 :List(Float32);
+  }
+
+  struct MetaData {
+    engagedProb @0 :Float32;
+    desirePrediction @1 :List(Float32);
+    brakeDisengageProb @2 :Float32;
+    gasDisengageProb @3 :Float32;
+    steerOverrideProb @4 :Float32;
+    desireState @5 :List(Float32);
+  }
+}
+
 
 struct CalibrationFeatures {
   frameId @0 :UInt32;
@@ -1909,7 +1967,6 @@ struct DMonitoringState {
   isDistracted @2 :Bool;
   awarenessStatus @3 :Float32;
   isRHD @4 :Bool;
-  rhdChecked @5 :Bool;
   posePitchOffset @6 :Float32;
   posePitchValidCount @7 :UInt32;
   poseYawOffset @8 :Float32;
@@ -1920,12 +1977,15 @@ struct DMonitoringState {
   isLowStd @13 :Bool;
   hiStdCount @14 :UInt32;
   isPreview @15 :Bool;
+
+  rhdCheckedDEPRECATED @5 :Bool;
 }
 
 struct Boot {
   wallTimeNanos @0 :UInt64;
   lastKmsg @1 :Data;
   lastPmsg @2 :Data;
+  launchLog @3 :Text;
 }
 
 struct LiveParametersData {
@@ -2065,6 +2125,7 @@ struct Event {
     dMonitoringState @71: DMonitoringState;
     liveLocationKalman @72 :LiveLocationKalman;
     sentinel @73 :Sentinel;
-    auxSensor @74 :FrameData;
+    wideFrame @74: FrameData;
+    modelV2 @75 :ModelDataV2;
   }
 }

@@ -14,8 +14,8 @@ Export('cython_dependencies')
 cereal_dir = Dir('.')
 
 cpppath = [
-    cereal_dir,
-    '/usr/lib/include',
+  cereal_dir,
+  '/usr/lib/include',
 ]
 
 AddOption('--test',
@@ -44,10 +44,9 @@ env = Environment(
   LINKFLAGS=ldflags_asan,
 
   CFLAGS="-std=gnu11",
-  CXXFLAGS="-std=c++14",
+  CXXFLAGS="-std=c++1z",
   CPPPATH=cpppath,
 )
-
-
 Export('env', 'zmq', 'arch')
+
 SConscript(['SConscript'])

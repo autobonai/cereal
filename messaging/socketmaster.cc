@@ -3,10 +3,13 @@
 #include "messaging.hpp"
 #include "services.h"
 
+<<<<<<< HEAD
 #ifdef __APPLE__
 #define CLOCK_BOOTTIME CLOCK_MONOTONIC
 #endif
 
+=======
+>>>>>>> comma/master
 static inline uint64_t nanos_since_boot() {
   struct timespec t;
   clock_gettime(CLOCK_BOOTTIME, &t);
@@ -164,9 +167,8 @@ PubMaster::PubMaster(const std::initializer_list<const char *> &service_list) {
   }
 }
 
-int PubMaster::send(const char *name, capnp::MessageBuilder &msg) {
-  auto words = capnp::messageToFlatArray(msg);
-  auto bytes = words.asBytes();
+int PubMaster::send(const char *name, MessageBuilder &msg) {
+  auto bytes = msg.toBytes();
   return send(name, bytes.begin(), bytes.size());
 }
 
